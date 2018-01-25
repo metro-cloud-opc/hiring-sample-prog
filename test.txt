@@ -1,0 +1,4 @@
+go run main.go &
+
+curl -XPOST --data 'fullUrl=http://www.google.com' http://localhost:8080/_add_bookmark
+curl -XPOST --data 'fullUrl=https://www.metroag.de/en' http://localhost:8080/_add_bookmark

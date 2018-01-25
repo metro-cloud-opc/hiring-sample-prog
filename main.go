@@ -8,13 +8,15 @@ import (
 	"time"
 )
 
+type Hashtable map[string]*Bookmark
+
 type Bookmark struct {
 	TinyName string
 	FullUrl  string
 }
 
 var (
-	bookmarks = map[string]*Bookmark{}
+	bookmarks = Hashtable{}
 )
 
 func main() {
@@ -39,12 +41,21 @@ func handleAddBookmark(w http.ResponseWriter, req *http.Request) {
 }
 
 func handleGetBookmark(w http.ResponseWriter, req *http.Request) {
-	tinyName := req.URL.Path[1:]
-	if tinyName == "" {
+	reqTinyName := req.URL.Path
+	if reqTinyName == "/" {
 		w.Write([]byte("<h1>Welcome to MyTinyUrl</h1>"))
 		return
+	} else {
+		reqTinyName = reqTinyName[1:]
 	}
-	bookmark := bookmarks[tinyName]
+
+	var bookmark *Bookmark
+	for key := range bookmarks {
+		if bookmarks[key].TinyName == reqTinyName {
+			bookmark = bookmarks[key]
+		}
+	}
+
 	if bookmark == nil {
 		http.Error(w, "Not Found", 404)
 		return

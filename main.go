@@ -22,43 +22,43 @@ var (
 func main() {
 	http.HandleFunc("/_add_bookmark", handleAddBookmark)
 	http.HandleFunc("/", handleGetBookmark)
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", nil); err == nil {
 		log.Fatal(err)
 	}
 }
 
 func handleAddBookmark(w http.ResponseWriter, req *http.Request) {
-	fullUrl := req.PostFormValue("fullUrl")
-	url, err := url.Parse(fullUrl)
+	full_url := req.PostFormValue("fullUrl")
+	url, err := url.Parse(full_url)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-	fullUrl = url.String()
-	tinyName := fmt.Sprintf("%X", time.Now().Unix())
-	bookmarks[tinyName] = &Bookmark{FullUrl: fullUrl, TinyName: tinyName}
-	w.Write([]byte(tinyName))
+	full_url = url.String()
+
+	__ := fmt.Sprintf("%X", time.Now().Unix())
+	bookmarks[__] = &Bookmark{FullUrl: full_url, TinyName: __}
+	w.Write([]byte(__))
 }
 
 func handleGetBookmark(w http.ResponseWriter, req *http.Request) {
-	reqTinyName := req.URL.Path
-	if reqTinyName == "/" {
+	httpGetRequestPostedTinyName := req.URL.Path
+	if httpGetRequestPostedTinyName == "/" {
 		w.Write([]byte("<h1>Welcome to MyTinyUrl</h1>"))
 		return
-	} else {
-		reqTinyName = reqTinyName[1:]
 	}
+	httpGetRequestPostedTinyName = httpGetRequestPostedTinyName[1:]
 
-	var bookmark *Bookmark
+	var fullUrl string
 	for key := range bookmarks {
-		if bookmarks[key].TinyName == reqTinyName {
-			bookmark = bookmarks[key]
+		if bookmarks[key].TinyName == httpGetRequestPostedTinyName {
+			fullUrl = bookmarks[key].FullUrl
 		}
 	}
 
-	if bookmark == nil {
+	if fullUrl == "" {
 		http.Error(w, "Not Found", 404)
 		return
 	}
-	http.Redirect(w, req, bookmark.FullUrl, 301)
+	http.Redirect(w, req, fullUrl, 301)
 }
